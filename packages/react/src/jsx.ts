@@ -20,7 +20,8 @@ function ReactElement(
 		type,
 		key,
 		ref,
-		props
+		props,
+		__mark: 'chen_yq'
 	};
 
 	return element;
