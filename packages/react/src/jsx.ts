@@ -27,7 +27,11 @@ function ReactElement(
 	return element;
 }
 
-export function jsx(type: ElementType, config: any, ...maybeChildren: any[]) {
+export function createElement(
+	type: ElementType,
+	config: any,
+	...maybeChildren: any
+) {
 	let key: Key = null;
 	let ref: Ref = null;
 	const props: Props = {};
@@ -54,7 +58,6 @@ export function jsx(type: ElementType, config: any, ...maybeChildren: any[]) {
 			props[propName] = val;
 		}
 	}
-
 	// handle maybeChildren
 	const maybeChildrenLength = maybeChildren.length;
 	if (maybeChildrenLength) {
@@ -63,6 +66,34 @@ export function jsx(type: ElementType, config: any, ...maybeChildren: any[]) {
 		} else {
 			props.children = maybeChildren;
 		}
+	}
+
+	return ReactElement(type, key, ref, props);
+}
+
+export function jsx(type: ElementType, config: any, maybeKey: Key) {
+	let key: Key = null;
+	let ref: Ref = null;
+	const props: Props = {};
+
+	// handle config params
+	for (const propName in config) {
+		const val = config[propName];
+
+		if (propName === 'ref') {
+			if (val !== undefined) {
+				ref = val;
+			}
+			continue;
+		}
+
+		if (hasOwnProperty.call(config, propName)) {
+			props[propName] = val;
+		}
+	}
+	// handle key
+	if (maybeKey !== undefined) {
+		key = '' + maybeKey;
 	}
 
 	return ReactElement(type, key, ref, props);
