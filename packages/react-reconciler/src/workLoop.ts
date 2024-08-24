@@ -1,23 +1,51 @@
 import { beginWork } from './beginWork';
 import { completeWork } from './completeWork';
-import { FiberNode } from './fiber';
+import { createWorkInProgress, FiberNode } from './fiber';
+import { FiberRootNode } from './fiberRoot';
+import { Fiber } from './internalTypes';
+import { HostRoot } from './workTags';
 
 let workInProgress: FiberNode | null = null;
-function prepareFreshStack(root: FiberNode) {
-	workInProgress = root;
+function prepareFreshStack(root: FiberRootNode) {
+	workInProgress = createWorkInProgress(root.current, {});
 }
 
-function renderRoot(root: FiberNode) {
+export function scheduleUpdateOnFiber(fiber: Fiber) {
+	const root = markUpdateFromFiberToRoot(fiber);
+	renderRoot(root);
+}
+
+function markUpdateFromFiberToRoot(fiber: Fiber) {
+	let node = fiber;
+	let parent = fiber.return;
+	while (parent !== null) {
+		node = parent;
+		parent = node.return;
+	}
+
+	return node.tag === HostRoot ? node.stateNode : null;
+}
+
+function renderRoot(root: FiberRootNode) {
 	prepareFreshStack(root);
 
 	do {
 		try {
 			workLoop();
+			break;
 		} catch (error) {
-			console.error('workLoop error', error);
+			if (__DEV__) {
+				console.error('workLoop error', error);
+			}
 			workInProgress = null;
 		}
 	} while (true);
+
+	const finishedWork = root.current.alternate;
+	root.finishedWork = finishedWork;
+
+	// TODO: commitRoot
+	// commitRoot(root);
 }
 
 function workLoop() {
@@ -27,7 +55,7 @@ function workLoop() {
 }
 
 function performUnitOfWork(unitOfWork: FiberNode) {
-	const next = beginWork(unitOfWork);
+	const next = beginWork(unitOfWork.alternate, unitOfWork);
 	unitOfWork.memoizedProps = unitOfWork.pendingProps;
 
 	if (next === null) {
@@ -42,7 +70,7 @@ function completeUnitOfWork(unitOfWork: FiberNode) {
 	const returnFiber = completedWork.return;
 
 	do {
-		completeWork(completedWork);
+		completeWork(completedWork.alternate, completedWork);
 
 		const siblingFiber = completedWork.sibling;
 		if (siblingFiber !== null) {

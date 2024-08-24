@@ -27,11 +27,11 @@ function ReactElement(
 	return element;
 }
 
-function hasValidRef(config: any)  {
-  return config.ref !== undefined
+function hasValidRef(config: any) {
+	return config.ref !== undefined;
 }
-function hasValidKey(config: any)  {
-  return config.key !== undefined
+function hasValidKey(config: any) {
+	return config.key !== undefined;
 }
 
 export function createElement(
@@ -78,29 +78,32 @@ export function createElement(
 	return ReactElement(type, key, ref, props);
 }
 
-
 export function jsx(type: ElementType, config: any, maybeKey: Key) {
 	let key: Key = null;
 	let ref: Ref = null;
 	const props: Props = {};
 
-  	// handle key
+	// handle key
 	if (maybeKey !== undefined) {
 		key = '' + maybeKey;
 	}
 
-  if(hasValidKey(config)) {
-    key = '' + config.Key
-  }
-  if(hasValidRef(config)) {
-    ref = config.ref
-  }
+	if (hasValidKey(config)) {
+		key = '' + config.Key;
+	}
+	if (hasValidRef(config)) {
+		ref = config.ref;
+	}
 
 	// handle config params
 	for (const propName in config) {
 		const val = config[propName];
 
-		if (hasOwnProperty.call(config, propName) && propName !== 'key' && propName !== 'ref') {
+		if (
+			hasOwnProperty.call(config, propName) &&
+			propName !== 'key' &&
+			propName !== 'ref'
+		) {
 			props[propName] = val;
 		}
 	}

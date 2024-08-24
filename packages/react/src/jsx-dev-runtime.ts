@@ -1,1 +1,1 @@
-export {jsxDEV} from './jsx/ReactJSX'
+export { jsxDEV } from './jsx/ReactJSX';

@@ -13,3 +13,5 @@ export interface ReactElementType {
 	// __mark is a custom property 为了区分react框架中的react元素
 	__mark: string;
 }
+
+export type Action<State> = State | ((prevState: State) => State);
